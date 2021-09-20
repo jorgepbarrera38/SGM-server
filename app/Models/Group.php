@@ -1,0 +1,27 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Group extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'name'
+    ];
+
+    public function scopeName($query, $name) {
+        return $query->where('name', 'like', '%' . $name . '%');
+    }
+
+    public function devices () {
+        return $this->hasMany('App\Models\Device');
+    }
+
+    public function users () {
+        return $this->belongsToMany('App\Models\User');
+    }
+}
