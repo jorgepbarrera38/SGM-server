@@ -37,11 +37,11 @@ class CompanyController extends Controller
         $request->validate([
             'logo' => 'nullable|mimes:jpg,jpeg',
             'reason_preventive_maintenance_report_digital' => 'required|max:500',
-            'complementTitle' => 'nullable|max:15',
+            'complement_title' => 'nullable|max:15',
         ], [], [
             'logo' => 'Logo',
             'reason_preventive_maintenance_report_digital' => 'Motivo de servicio para mantenimientos preventivos',
-            'complementTitle' => 'Complemento título',
+            'complement_title' => 'Complemento título',
         ]);
 
         if ($request->hasFile('logo')) {
@@ -60,12 +60,12 @@ class CompanyController extends Controller
             }
     
             $company->reason_preventive_maintenance_report_digital = $request->reason_preventive_maintenance_report_digital;
-            $company->complement_title = $request->complementTitle;
+            $company->complement_title = $request->complement_title;
             $company->save();
             
         } else {
             $company = (new Company)->fill(['reason_preventive_maintenance_report_digital' => $request->reason_preventive_maintenance_report_digital,
-                                            'complement_title' => $request->complementTitle]);
+                                            'complement_title' => $request->complement_title]);
                                             
             if ($request->hasFile('logo')) {
                 $company->logo = $pathLogo;
