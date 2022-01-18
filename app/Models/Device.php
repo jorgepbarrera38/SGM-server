@@ -10,6 +10,7 @@ class Device extends Model
     use HasFactory;
 
     protected $fillable = [
+        'resume_number',
         'group_id',
         'element_id',
         'location_id',

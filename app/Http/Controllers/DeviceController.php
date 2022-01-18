@@ -70,8 +70,8 @@ class DeviceController extends Controller
                         $query->where('principal', true);
                     }])
                     ->with('location')
-                    ->select('id', 'group_id', 'element_id', 'internal_code', 'serial_number', 'location_id', 'dependence_id', 'responsible_id', 'description', 'observations', 'updated_at')
-                    ->orderBy('id')
+                    ->select('id', 'resume_number', 'group_id', 'element_id', 'internal_code', 'serial_number', 'location_id', 'dependence_id', 'responsible_id', 'description', 'observations', 'updated_at')
+                    ->orderBy('resume_number')
                     ->paginate(8);
 
             if (json_decode(request()->get('get-filters'))) { //Devuelve true o false
@@ -164,6 +164,16 @@ class DeviceController extends Controller
         if (!$hasPermissionInGroup) {
             return response()->json(['errors' => ['message' => ['El usuario no está autorizado en el grupo seleccionado']]], 422);
         }
+
+        /*Definiendo número de hoja de vida*/
+        $deviceLastResumeNumber = Device::where('group_id', $data['group_id'])->orderBy('resume_number', 'desc')->first();
+
+        if ($deviceLastResumeNumber) {
+            $data['resume_number'] = $deviceLastResumeNumber->resume_number + 1;
+        } else {
+            $data['resume_number'] = 1;
+        }
+
 
         \DB::transaction(function () use ($data) {
             $device = auth()->user()->devices()->create($data);
@@ -281,6 +291,14 @@ class DeviceController extends Controller
 
         if (!$hasPermissionInGroup) {
             return response()->json(['errors' => ['message' => ['El usuario no está autorizado en el grupo seleccionado']]], 422);
+        }
+
+        $existsDeviceWithSameResumenNumber = Device::where([
+                                                                'group_id' => $data['group_id'],
+                                                                'resume_number' => $device->resume_number
+                                                            ])->first();
+        if ($existsDeviceWithSameResumenNumber) {
+            return response()->json(['errors' => ['message' => ['Ya existe un dispositivo con el mismo número de hoja de vida en el grupo seleccionado']]], 422);
         }
 
         $device->update($data);

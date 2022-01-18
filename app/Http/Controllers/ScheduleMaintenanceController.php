@@ -134,14 +134,14 @@ class ScheduleMaintenanceController extends Controller
     {
         return ScheduleMaintenance::where('id', $scheduleMaintenance)
                                     ->with('recordDelScheduleMaintenances.user:id,names')
-                                    ->with('recordDelScheduleMaintenances.device:id,internal_code,serial_number')
+                                    ->with('recordDelScheduleMaintenances.device:id,resume_number,internal_code,serial_number')
                                     ->with('recordDelScheduleMaintenances:id,user_id,schedule_maintenance_id,created_at,observation,device_id')
                                     ->with('scheduleMaintenanceDetails.preventiveMaintenance:id,evidence')
                                     ->with('scheduleMaintenanceDetails.device.group:id,name')
                                     ->with('scheduleMaintenanceDetails.device.location:id,name')
                                     ->with('scheduleMaintenanceDetails.device.element:id,name')
                                     ->with('scheduleMaintenanceDetails.device.dependence:id,name')
-                                    ->with('scheduleMaintenanceDetails.device:id,internal_code,serial_number,group_id,location_id,element_id,dependence_id')
+                                    ->with('scheduleMaintenanceDetails.device:id,resume_number,internal_code,serial_number,group_id,location_id,element_id,dependence_id')
                                     ->with('scheduleMaintenanceDetails:id,made,date,preventive_maintenance_id,schedule_maintenance_id,device_id')
                                     ->with('scheduleMaintenanceDetails.recordScheduleMaintenances.user:id,names')
                                     ->with(['scheduleMaintenanceDetails' => function ($query) {

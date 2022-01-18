@@ -26,7 +26,7 @@ class AddComplementTitleToCompanyTable extends Migration
     public function down()
     {
         Schema::table('companies', function (Blueprint $table) {
-            //
+            $table->dropColumn('complement_title');
         });
     }
 }
