@@ -134,6 +134,7 @@ class ScheduleMaintenanceController extends Controller
     {
         return ScheduleMaintenance::where('id', $scheduleMaintenance)
                                     ->with('recordDelScheduleMaintenances.user:id,names')
+                                    ->with('recordDelScheduleMaintenances.device:id,internal_code,serial_number')
                                     ->with('recordDelScheduleMaintenances:id,user_id,schedule_maintenance_id,created_at,observation,device_id')
                                     ->with('scheduleMaintenanceDetails.preventiveMaintenance:id,evidence')
                                     ->with('scheduleMaintenanceDetails.device.group:id,name')
