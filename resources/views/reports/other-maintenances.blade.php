@@ -1,7 +1,8 @@
 <table>
     <thead>
     <tr>
-        <th><strong>FECHA DE REALIZACIÓN</strong></th>
+        <th><strong>FECHA Y HORA INICIO DE REALIZACIÓN</strong></th>
+        <th><strong>FECHA Y HORA FIN DE REALIZACIÓN</strong></th>
         <th><strong>GRUPO</strong></th>
         <th><strong>ELEMENTO</strong></th>
         <th><strong>PLACA</strong></th>
@@ -11,6 +12,7 @@
         <th><strong>CLASIFICACIÓN DEL SERVICIO</strong></th>
         <th><strong>MOTIVO</strong></th>
         <th><strong>CONCLUSIÓN</strong></th>
+        <th><strong>MODO DE FALLA</strong></th>
         <th><strong>USUARIO</strong></th>
         <th><strong>REPUESTOS O CONSUMIBLES USADOS</strong></th>
     </tr>
@@ -19,6 +21,7 @@
     @foreach($otherMaintenances as $otherMaintenance)
         <tr>
             <td>{{ $otherMaintenance->date_of_realization }}</td>
+            <td>{{ $otherMaintenance->date_of_realization_ending }}</td>
             <td>{{ $otherMaintenance->device->group->name }}</td> 
             <td>{{ $otherMaintenance->device->element->name }}</td> 
             <td>{{ $otherMaintenance->device->internal_code }}</td>  
@@ -28,6 +31,7 @@
             <td>{{ $otherMaintenance->typeOtherMaintenance->name }}</td>
             <td>{{ $otherMaintenance->reason }}</td>
             <td>{{ $otherMaintenance->conclusion }}</td>
+            <td>{{ $otherMaintenance->failureMode ? $otherMaintenance->failureMode->name : '' }}</td>
             <td>{{ $otherMaintenance->user->names }}</td>
             <td>
                 @foreach ($otherMaintenance->replacementMaintenancables as $replacement )

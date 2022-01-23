@@ -9,6 +9,7 @@ use App\Models\Location;
 use App\Models\Dependence;
 use App\Models\Responsible;
 use App\Models\Brand;
+use App\Models\Company;
 use App\Models\PhotographicRecord;
 use App\Models\RecordInternalCodeDevice;
 use Illuminate\Http\Request;
@@ -297,7 +298,7 @@ class DeviceController extends Controller
                                                                 'group_id' => $data['group_id'],
                                                                 'resume_number' => $device->resume_number
                                                             ])->first();
-        if ($existsDeviceWithSameResumenNumber) {
+        if ($existsDeviceWithSameResumenNumber && $device->group_id !=  $data['group_id']) {
             return response()->json(['errors' => ['message' => ['Ya existe un dispositivo con el mismo número de hoja de vida en el grupo seleccionado']]], 422);
         }
 
@@ -449,5 +450,11 @@ class DeviceController extends Controller
         } 
         
         $photographicRecord->delete();
+    }
+
+    public function getResume (Device $device) {
+        $company = Company::firstOrFail();
+        $pdf = \PDF::loadView('resume.resume', ['device' => $device, 'companyLogo' => $company->logo])->setPaper('letter');
+        return $pdf->download();
     }
 }

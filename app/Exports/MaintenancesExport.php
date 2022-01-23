@@ -22,7 +22,7 @@ class MaintenancesExport implements FromView
     public function view(): View
     {
         if ($this->type_maintenance == 1) {
-           $preventiveMaintenances = PreventiveMaintenance::whereBetween('date_of_realization', [ 
+           $preventiveMaintenances = PreventiveMaintenance::whereBetween('date_of_realization_ending', [ 
                                         $this->initial_date, $this->final_date
                                 ])
                                 ->when($this->user_selected, function ($query, $user_selected) {
@@ -37,13 +37,13 @@ class MaintenancesExport implements FromView
                                 ->with('location')
                                 ->with('dependence')
                                 ->with('replacementMaintenancables.replacement')
-                                ->orderBy('date_of_realization', 'desc')
+                                ->orderBy('date_of_realization_ending', 'desc')
                                 ->get();
 
             return view('reports.preventive-maintenances', [ 'preventiveMaintenances' => $preventiveMaintenances ]);                                
 
         } else if ($this->type_maintenance == 2) {
-            $otherMaintenances = OtherMaintenance::whereBetween('date_of_realization', [
+            $otherMaintenances = OtherMaintenance::whereBetween('date_of_realization_ending', [
                                         $this->initial_date, $this->final_date
                                 ])
                                 ->when($this->user_selected, function ($query, $user_selected) {
@@ -60,12 +60,13 @@ class MaintenancesExport implements FromView
                                 ->with('dependence')
                                 ->with('replacementMaintenancables.replacement')
                                 ->with('typeOtherMaintenance')
-                                ->orderBy('date_of_realization', 'desc')
+                                ->with('failureMode')
+                                ->orderBy('date_of_realization_ending', 'desc')
                                 ->get();
                                 
             return view('reports.other-maintenances', [ 'otherMaintenances' => $otherMaintenances ]);
         } else {
-            $maintenances = OtherMaintenance::whereBetween('date_of_realization', [
+            $maintenances = OtherMaintenance::whereBetween('date_of_realization_ending', [
                                 $this->initial_date, $this->final_date
                         ])
                         ->when($this->user_selected, function ($query, $user_selected) {
@@ -77,7 +78,7 @@ class MaintenancesExport implements FromView
                         ->with('dependence')
                         ->with('replacementMaintenancables.replacement')
                         ->with('typeOtherMaintenance')
-                        ->orderBy('date_of_realization', 'desc')
+                        ->orderBy('date_of_realization_ending', 'desc')
                         ->get();
                         
                 return view('reports.maintenances', [ 'maintenances' => $maintenances ]);

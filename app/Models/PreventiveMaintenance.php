@@ -11,6 +11,7 @@ class PreventiveMaintenance extends Model
 
     protected $fillable = [
         'date_of_realization',
+        'date_of_realization_ending',
         'evidence',
         'reason',
         'location_id',

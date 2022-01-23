@@ -49,6 +49,7 @@ Route::middleware('auth')->group(function () {
         Route::get('devices/{device}/get-photographic-record', 'DeviceController@getPhotographicRecord');
         Route::post('devices/{photographicRecord}/select-as-principal', 'DeviceController@selectAsPrincipal');
         Route::delete('devices/{photographicRecord}/delete-photographic-record', 'DeviceController@deletePhotographicRecord');
+        Route::get('devices/{device}/get-resume', 'DeviceController@getResume');
         
         Route::post('movements/{device}', 'MovementController@store');
         Route::get('movements/get-data-to-create-movement/{device}', 'MovementController@getDataToCreateMovement');
@@ -107,6 +108,8 @@ Route::middleware('auth')->group(function () {
         Route::apiResource('company', 'CompanyController')->only(['index', 'store']);
         
         Route::apiResource('type-documents', 'TypeDocumentController');
+
+        Route::apiResource('failure-modes', 'FailureModeController');
 
 });
 

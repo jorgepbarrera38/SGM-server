@@ -35,6 +35,8 @@ class PreventiveMaintenanceController extends Controller
 
     public function store(PreventiveMaintenanceRequest $request, Device $device)
     {
+        /*$datos = array_chunk($request->photographicAnnexes, 2);
+        return response()->json(['errors' => ['message' => $datos]], 422);*/
         //Validando que los repuestos existan y tengan cantidades
         $replacements = json_decode($request->replacementsInJson, true);
         if ($errors = replacementsHasErrors($replacements)) {
@@ -52,8 +54,8 @@ class PreventiveMaintenanceController extends Controller
         }
 
         //Verificando que el periodo esté activo
-        if (!periodIsActive($request->date_of_realization)) {
-            return response()->json(['errors' => ['message' => ['La fecha de realización no se encuentra en un periodo vigente']]], 422);
+        if (!periodIsActive($request->date_of_realization_ending)) {
+            return response()->json(['errors' => ['message' => ['La fecha y hora fin de realización no se encuentra en un periodo vigente']]], 422);
         }
 
         //Verificando que el usuario esté autorizado en el grupo del dispositivo
@@ -72,7 +74,6 @@ class PreventiveMaintenanceController extends Controller
 
             //Obteniendo la data para generar el reporte digital pdf
             $data = getDataForReportDigitalToPreventiveMaintenance($request, $replacements, $device);
-
             //Creando el reporte digital en base a una vista
             $pdf = \PDF::loadView('reports-digital.general-maintenances-preventives-and-others', $data)->setPaper('letter');
             //return $pdf->download('asd.pdf');
@@ -84,8 +85,8 @@ class PreventiveMaintenanceController extends Controller
         }
 
         //Verificando que esté programado el preventivo para la fecha dada y que la programación esté activa
-        $yearFromRequest = Carbon::createFromDate($request->date_of_realization)->year;
-        $monthFromRequest = Carbon::createFromDate($request->date_of_realization)->month;
+        $yearFromRequest = Carbon::createFromDate($request->date_of_realization_ending)->year;
+        $monthFromRequest = Carbon::createFromDate($request->date_of_realization_ending)->month;
 
         $scheduleMaintenanceDetail = ScheduleMaintenanceDetail::whereYear('date', $yearFromRequest)
                                                               ->whereMonth('date', $monthFromRequest)
@@ -96,7 +97,7 @@ class PreventiveMaintenanceController extends Controller
                                                               ->first();
 
         if (!$scheduleMaintenanceDetail) {
-            return response()->json(['errors' => ['message' => ['El dispositivo no tiene programación de mantenimiento preventivo para la fecha dada']]], 422);   
+            return response()->json(['errors' => ['message' => ['El dispositivo no tiene programación de mantenimiento preventivo para la fecha y hora de finalización dada']]], 422);   
         }
 
         //Verificando que el preventivo no haya sido realizado con anterioridad
@@ -108,6 +109,7 @@ class PreventiveMaintenanceController extends Controller
             //Registrando el preventivo
             $preventiveMaintenance = $device->preventiveMaintenances()->create([
                 'date_of_realization' => $request->date_of_realization,
+                'date_of_realization_ending' => $request->date_of_realization_ending,
                 'evidence' => $pathEvidence,
                 'location_id' => $device->location_id,
                 'dependence_id' => $device->dependence_id,
@@ -138,9 +140,10 @@ class PreventiveMaintenanceController extends Controller
         $replacements = Replacement::orderBy('name')->get(['id', 'name']);
         return [
             'date_of_realization' => $preventiveMaintenance->date_of_realization,
+            'date_of_realization_ending' => $preventiveMaintenance->date_of_realization_ending,
             'description_support_preventive_maintenance' => $description_support_preventive_maintenance,
             'replacementsFromPreventive' => $preventiveMaintenance->replacementMaintenancables,
-            'replacements' => $replacements
+            'replacements' => $replacements,
         ];
     }
 
@@ -171,8 +174,8 @@ class PreventiveMaintenanceController extends Controller
         }
 
         //Verificando que el periodo esté activo
-        if (!periodIsActive($request->date_of_realization)) {
-            return response()->json(['errors' => ['message' => ['La fecha de realización no se encuentra en un periodo vigente']]], 422);
+        if (!periodIsActive($request->date_of_realization_ending)) {
+            return response()->json(['errors' => ['message' => ['La fecha y hora fin de realización no se encuentra en un periodo vigente']]], 422);
         }
 
         //Verificando que el usuario esté autorizado en el grupo del dispositivo
@@ -204,8 +207,8 @@ class PreventiveMaintenanceController extends Controller
 
         //Verificando que esté programado el preventivo para la fecha dada
         //$scheduleMaintenanceDetail = ScheduleMaintenanceDetail::->firstOrFail();
-        $yearFromRequest = Carbon::createFromDate($request->date_of_realization)->year;
-        $monthFromRequest = Carbon::createFromDate($request->date_of_realization)->month;
+        $yearFromRequest = Carbon::createFromDate($request->date_of_realization_ending)->year;
+        $monthFromRequest = Carbon::createFromDate($request->date_of_realization_ending)->month;
 
         $scheduleMaintenanceDetail = ScheduleMaintenanceDetail::whereYear('date', $yearFromRequest)
                                                               ->whereMonth('date', $monthFromRequest)
@@ -216,7 +219,7 @@ class PreventiveMaintenanceController extends Controller
                                                               ->first();
 
         if (!$scheduleMaintenanceDetail) {
-            return response()->json(['errors' => ['message' => ['El dispositivo no tiene programación de mantenimiento preventivo para la fecha dada']]], 422);   
+            return response()->json(['errors' => ['message' => ['El dispositivo no tiene programación de mantenimiento preventivo para la fecha y hora de finalización dada']]], 422);   
         }
         
         //Verificando que el preventivo no haya sido realizado con anterioridad
@@ -231,6 +234,7 @@ class PreventiveMaintenanceController extends Controller
             //Actualizando el preventivo
             $preventiveMaintenance->evidence = $pathEvidence;
             $preventiveMaintenance->date_of_realization = $request->date_of_realization;
+            $preventiveMaintenance->date_of_realization_ending = $request->date_of_realization_ending;
             $preventiveMaintenance->location_id = $preventiveMaintenance->device->location_id;
             $preventiveMaintenance->dependence_id = $preventiveMaintenance->device->dependence_id;
             $preventiveMaintenance->update();

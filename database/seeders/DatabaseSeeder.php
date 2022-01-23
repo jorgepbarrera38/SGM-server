@@ -25,13 +25,13 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(PermissionsTableSeeder::class);
         
-        \App\Models\User::create([
+        /*\App\Models\User::create([
             'names' => 'Administrador',
             'username' => 'admin',
             'password' => bcrypt(123),
             'official_position' => 'Administrador del sistema',
             'technical_support' => true
-        ]);
+        ]);*/
 /*
         Element::factory()->count(4)->create();
         Location::factory()->count(3)->create();

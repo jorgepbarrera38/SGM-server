@@ -8,6 +8,7 @@ use App\Models\Dependence;
 use App\Models\OtherMaintenance;
 use App\Models\TypeOtherMaintenance;
 use App\Models\Replacement;
+use App\Models\FailureMode;
 use Illuminate\Support\Facades\Storage;
 use App\Http\Requests\OtherMaintenanceRequest;
 use Illuminate\Http\Request;
@@ -33,12 +34,14 @@ class MaintenanceController extends Controller
         $replacements =  Replacement::orderBy('name')->get(['id', 'name']);
         $locations = Location::orderBy('name')->get();
         $dependences = Dependence::orderBy('name')->get();
+        $failureModes = FailureMode::orderBy('name')->get(['id', 'name']);
         
         return [
             'typeOtherMaintenances' => $typeOtherMaintenances,
             'replacements' => $replacements,
             'locations' => $locations,
-            'dependences' => $dependences
+            'dependences' => $dependences,
+            'failureModes' => $failureModes
         ];
     }
 
@@ -67,8 +70,8 @@ class MaintenanceController extends Controller
         }
 
         //Verificando que el periodo esté activo
-        if (!periodIsActive($request->date_of_realization)) {
-            return response()->json(['errors' => ['message' => ['La fecha de realización no se encuentra en un periodo vigente']]], 422);
+        if (!periodIsActive($request->date_of_realization_ending)) {
+            return response()->json(['errors' => ['message' => ['La fecha y hora fin de realización no se encuentra en un periodo vigente']]], 422);
         }
         
         //Verificando si el reporte es digital=1 o físico=2 para generar o guardar el pdf
@@ -95,9 +98,11 @@ class MaintenanceController extends Controller
         \DB::transaction(function () use ($request, $pathEvidence, $replacements) {
             $otherMaintenance = OtherMaintenance::create([
                 'date_of_realization' => $request->date_of_realization,
+                'date_of_realization_ending' => $request->date_of_realization_ending,
                 'type_other_maintenance_id' => $request->type_maintenance_id,
                 'reason' => $request->reason,
                 'conclusion' => $request->conclusion,
+                'failure_mode_id' => $request->failure_mode_id,
                 'location_id' => $request->location_id,
                 'dependence_id' => $request->dependence_id,
                 'evidence' => $pathEvidence,

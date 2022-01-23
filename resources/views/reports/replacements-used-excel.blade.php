@@ -16,7 +16,7 @@
     <tbody>
     @foreach($replacementsUsed as $replacementUsed)
         <tr>
-            <td>{{ $replacementUsed->replacementMaintenancable->date_of_realization }}</td>
+            <td>{{ $replacementUsed->replacementMaintenancable->date_of_realization_ending }}</td>
             <td>{{ $replacementUsed->replacement->name }}</td>
             <td>{{ $replacementUsed->quantity }}</td>
             <td>

@@ -30,10 +30,9 @@
         <table border="1" width="100%">
             <tr>
                 <th class="title align-justify">HOJA DE VIDA</th>
-                <th class="align-justify">{{ $device->id }}</th>
+                <th class="align-justify">{{ $device->resume_number }}</th>
                 <th class="title align-justify">FECHA</th>
-                <th class="align-justify">{{ $date_of_realization }}</th>
-                
+                <th class="align-justify">{{ Carbon\Carbon::createFromDate($date_of_realization_ending) }}</th>
             </tr>
             <tr>
                 <th class="title align-justify">EQUIPO Y/O ELEMENTO</th>
@@ -62,7 +61,7 @@
         <table border="1" width="100%">
             <tr>
                 <th class="title align-justify">FECHA</th>
-                <th colspan="3" class="align-justify">{{ $date_of_realization }}</th>
+                <th colspan="3" class="align-justify">{{ Carbon\Carbon::createFromDate($date_of_realization_ending) }}</th>
             </tr>
             <tr>
                 <th class="title align-justify">UBICACIÓN</th>
@@ -102,6 +101,33 @@
         <tr>
             <th colspan="4" style="text-align: justify">{{ $conclusion }}</th>
         </tr>
+
+
+        <tr>
+            <th colspan="4" class="title">ANEXOS FOTOGRÁFICOS</th>
+        </tr>
+       
+        @foreach ($photographicAnnexes as $photographicAnnexeGrouped)
+            <tr>
+                @foreach($photographicAnnexeGrouped as $photographicAnnexe)
+                    <th colspan="2" class="title">{{ $photographicAnnexe['description'] }}</th>
+                @endforeach
+                @if($loop->last && count($photographicAnnexeGrouped) == 1)
+                    <th colspan="2" class="title"></th>
+                @endif
+            </tr>
+            <tr>
+                @foreach($photographicAnnexeGrouped as $photographicAnnexe)
+                    <th colspan="2">
+                        <img src="{{ $photographicAnnexe['image'] }}" width="200">
+                    </th>                
+                @endforeach
+                @if($loop->last && count($photographicAnnexeGrouped) == 1)
+                    <th colspan="2"></th>
+                @endif
+            </tr>
+        @endforeach
+                
         <tr>
             <th colspan="4" class="title">GASTOS GENERADOS</th>
         </tr>

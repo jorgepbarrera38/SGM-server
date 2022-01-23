@@ -11,9 +11,11 @@ class OtherMaintenance extends Model
 
     protected $fillable = [
         'date_of_realization',
+        'date_of_realization_ending',
         'type_other_maintenance_id',
         'reason',
         'conclusion',
+        'failure_mode_id',
         'location_id',
         'dependence_id',
         'evidence',
@@ -30,6 +32,10 @@ class OtherMaintenance extends Model
 
     public function typeOtherMaintenance () {
         return $this->belongsTo('App\Models\TypeOtherMaintenance');
+    }
+
+    public function failureMode () {
+        return $this->belongsTo('App\Models\FailureMode');
     }
 
     public function replacementMaintenancables () {

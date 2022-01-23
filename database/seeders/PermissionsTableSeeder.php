@@ -13,7 +13,7 @@ class PermissionsTableSeeder extends Seeder
      * @return void
      */
     public function run()
-    {
+    {/*
         //Devices
         Permission::create([
             'name' => 'devices.index',
@@ -401,6 +401,26 @@ class PermissionsTableSeeder extends Seeder
         Permission::create([
             'name' => 'reports.replacements',
             'description' => 'Consultar repuestos usados'
+        ]);*/
+        //Modos de falla
+        Permission::create([
+            'name' => 'failure-modes.index',
+            'description' => 'Listar modos de falla'
+        ]);
+
+        Permission::create([
+            'name' => 'failure-modes.create',
+            'description' => 'Registrar modos de falla'
+        ]);
+
+        Permission::create([
+            'name' => 'failure-modes.edit',
+            'description' => 'Editar modos de falla'
+        ]);
+
+        Permission::create([
+            'name' => 'failure-modes.destroy',
+            'description' => 'Eliminar modos de falla'
         ]);
     }
 }

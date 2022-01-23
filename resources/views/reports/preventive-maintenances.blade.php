@@ -1,7 +1,8 @@
 <table>
     <thead>
     <tr>
-        <th><strong>FECHA DE REALIZACIÓN</strong></th>
+        <th><strong>FECHA Y HORA INICIO DE REALIZACIÓN</strong></th>
+        <th><strong>FECHA Y HORA FIN DE REALIZACIÓN</strong></th>
         <th><strong>GRUPO</strong></th>
         <th><strong>ELEMENTO</strong></th>
         <th><strong>PLACA</strong></th>
@@ -16,6 +17,7 @@
     @foreach($preventiveMaintenances as $preventiveMaintenance)
         <tr>
             <td>{{ $preventiveMaintenance->date_of_realization }}</td>
+            <td>{{ $preventiveMaintenance->date_of_realization_ending }}</td>
             <td>{{ $preventiveMaintenance->device->group->name }}</td> 
             <td>{{ $preventiveMaintenance->device->element->name }}</td> 
             <td>{{ $preventiveMaintenance->device->internal_code }}</td>  

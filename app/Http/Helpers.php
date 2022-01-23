@@ -8,9 +8,9 @@ use App\Models\Location;
 use App\Models\Dependence;
 use Illuminate\Support\Facades\Storage;
 
-    function periodIsActive ($date_of_realization) {
-        return Period::where('start', '<=', $date_of_realization)->
-                        where('end', '>=', $date_of_realization)
+    function periodIsActive ($date_of_realization_ending) {
+        return Period::where('start', '<=', $date_of_realization_ending)
+                        ->where('end', '>=', $date_of_realization_ending)
                         ->where('active', true)
                         ->count();
         
@@ -50,7 +50,7 @@ use Illuminate\Support\Facades\Storage;
 
         return [
             'companyLogo' => $companyLogo,
-            'date_of_realization' => $request->date_of_realization,
+            'date_of_realization_ending' => $request->date_of_realization_ending,
             'typeMaintenance' => $typeMaintenance, 
             'reason' => $request->reason,
             'conclusion' => $request->conclusion,
@@ -78,11 +78,12 @@ use Illuminate\Support\Facades\Storage;
 
         return [
             'companyLogo' => $companyLogo,
-            'date_of_realization' => $request->date_of_realization,
+            'date_of_realization_ending' => $request->date_of_realization_ending,
             'typeMaintenance' => null, //Se envía null para validar en blade y como no tiene clasificación se pone Mantenimiento preventivo
             'replacementsFromReport' => $replacementsFromReport,
             'reason' => $reason,
             'conclusion' => $request->conclusion,
+            'photographicAnnexes' => $request->photographicAnnexes ? array_chunk($request->photographicAnnexes, 2) : [],
             'device' => $device,
             'signature' => $request->signature,
             'official_names' => $request->official_names,

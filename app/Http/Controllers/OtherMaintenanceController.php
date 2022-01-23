@@ -7,6 +7,7 @@ use App\Models\Device;
 use App\Models\Period;
 use App\Models\TypeOtherMaintenance;
 use App\Models\Replacement;
+use App\Models\FailureMode;
 use App\Http\Requests\OtherMaintenanceRequest;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -24,11 +25,13 @@ class OtherMaintenanceController extends Controller
 
     public function getDataToCreateOtherMaintenance () {
         $typeOtherMaintenances =  TypeOtherMaintenance::orderBy('name')->get(['id', 'name']);
-        $replacements =  Replacement::orderBy('name')->get(['id', 'name']);
+        $replacements = Replacement::orderBy('name')->get(['id', 'name']);
+        $failureModes = FailureMode::orderBy('name')->get(['id', 'name']);
         
         return [
             'typeOtherMaintenances' => $typeOtherMaintenances,
-            'replacements' => $replacements
+            'replacements' => $replacements,
+            'failureModes' => $failureModes
         ];
     }
 
@@ -51,8 +54,8 @@ class OtherMaintenanceController extends Controller
         }
 
         //Verificando que el periodo esté activo
-        if (!periodIsActive($request->date_of_realization)) {
-            return response()->json(['errors' => ['message' => ['La fecha de realización no se encuentra en un periodo vigente']]], 422);
+        if (!periodIsActive($request->date_of_realization_ending)) {
+            return response()->json(['errors' => ['message' => ['La fecha y hora fin de realización no se encuentra en un periodo vigente']]], 422);
         }
 
         //Verificando que el usuario esté autorizado en el grupo del dispositivo
@@ -86,9 +89,11 @@ class OtherMaintenanceController extends Controller
         \DB::transaction(function () use ($device, $request, $pathEvidence, $replacements) {
             $otherMaintenance = $device->otherMaintenances()->create([
                 'date_of_realization' => $request->date_of_realization,
+                'date_of_realization_ending' => $request->date_of_realization_ending,
                 'type_other_maintenance_id' => $request->type_maintenance_id,
                 'reason' => $request->reason,
                 'conclusion' => $request->conclusion,
+                'failure_mode_id' => $request->failure_mode_id,
                 'location_id' => $device->location_id,
                 'dependence_id' => $device->dependence_id,
                 'evidence' => $pathEvidence,
@@ -142,8 +147,8 @@ class OtherMaintenanceController extends Controller
         }
 
         //Verificando que el periodo esté activo
-        if (!periodIsActive($request->date_of_realization)) {
-            return response()->json(['errors' => ['message' => ['La fecha de realización no se encuentra en un periodo vigente']]], 422);
+        if (!periodIsActive($request->date_of_realization_ending)) {
+            return response()->json(['errors' => ['message' => ['La fecha y hora fin de realización no se encuentra en un periodo vigente']]], 422);
         }
 
         //Verificando que el usuario esté autorizado en el grupo del dispositivo
@@ -175,7 +180,7 @@ class OtherMaintenanceController extends Controller
 
         $pathEvidencePrevious = $otherMaintenance->evidence;
 
-        $otherMaintenance->fill($request->only(['date_of_realization', 'type_other_maintenance_id', 'reason', 'conclusion']));
+        $otherMaintenance->fill($request->only(['date_of_realization', 'date_of_realization_ending', 'failure_mode_id', 'type_other_maintenance_id', 'reason', 'conclusion']));
         $otherMaintenance->location_id = $otherMaintenance->device->location_id;
         $otherMaintenance->dependence_id = $otherMaintenance->device->dependence_id;
         $otherMaintenance->evidence = $pathEvidence;

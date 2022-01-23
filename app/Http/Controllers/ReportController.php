@@ -28,7 +28,7 @@ class ReportController extends Controller
 
     public function replacementsUsed () {
         return ReplacementMaintenance::whereHas('replacementMaintenancable', function (Builder $query) {
-                                        $query->whereBetween('date_of_realization', [request()->initial_date, request()->final_date]);
+                                        $query->whereBetween('date_of_realization_ending', [request()->initial_date, request()->final_date]);
                                     })
                                     ->orderBy('created_at', 'desc')
                                     ->with('replacementMaintenancable.user:id,names')
@@ -45,7 +45,6 @@ class ReportController extends Controller
     }
 
     public function maintenances (Request $request) {
-
         if ($request->type_maintenance != 3) {
             //Verificando que el usuario esté autorizado en el grupo seleccionado
             $hasPermissionInGroup = auth()->user()->groups()->where('groups.id', request('group'))->first();
@@ -56,7 +55,7 @@ class ReportController extends Controller
         }
 
         if ($request->type_maintenance == 1) {
-            return PreventiveMaintenance::whereBetween('date_of_realization', [ 
+            return PreventiveMaintenance::whereBetween('date_of_realization_ending', [ 
                                                         $request->initial_date, $request->final_date
                                             ])
                                             ->when($request->user_selected, function ($query, $userSelected) {
@@ -71,11 +70,11 @@ class ReportController extends Controller
                                             ->with('location')
                                             ->with('dependence')
                                             ->with('replacementMaintenancables.replacement')
-                                            ->orderBy('date_of_realization', 'desc')
+                                            ->orderBy('date_of_realization_ending', 'desc')
                                             ->paginate(10);
 
         } else if ($request->type_maintenance == 2) {
-            return OtherMaintenance::whereBetween('date_of_realization', [ 
+            return OtherMaintenance::whereBetween('date_of_realization_ending', [ 
                                                         $request->initial_date, $request->final_date
                                                   ])
                                                   ->when($request->user_selected, function ($query, $userSelected) {
@@ -91,11 +90,12 @@ class ReportController extends Controller
                                                   ->with('location')
                                                   ->with('dependence')
                                                   ->with('typeOtherMaintenance')
+                                                  ->with('failureMode')
                                                   ->with('replacementMaintenancables.replacement')
-                                                  ->orderBy('date_of_realization', 'desc')
+                                                  ->orderBy('date_of_realization_ending', 'desc')
                                                   ->paginate(10);
         } else {
-            return OtherMaintenance::whereBetween('date_of_realization', [ 
+            return OtherMaintenance::whereBetween('date_of_realization_ending', [ 
                                                 $request->initial_date, $request->final_date
                                             ])
                                             ->when($request->user_selected, function ($query, $userSelected) {
@@ -106,8 +106,9 @@ class ReportController extends Controller
                                             ->with('location')
                                             ->with('dependence')
                                             ->with('typeOtherMaintenance')
+                                            ->with('failureMode')
                                             ->with('replacementMaintenancables.replacement')
-                                            ->orderBy('date_of_realization', 'desc')
+                                            ->orderBy('date_of_realization_ending', 'desc')
                                             ->paginate(10);
         } 
 
@@ -129,9 +130,9 @@ class ReportController extends Controller
         $maintenances;
 
         if ($request->type_maintenance == 1) {
-            $maintenances = PreventiveMaintenance::whereBetween('date_of_realization', [ 
+            $maintenances = PreventiveMaintenance::whereBetween('date_of_realization_ending', [ 
                                         $request->initial_date, $request->final_date
-                                ])->orderBy('date_of_realization', 'desc')
+                                ])->orderBy('date_of_realization_ending', 'desc')
                                 ->when($request->user_selected, function ($query, $userSelected) {
                                     return $query->where('user_id', $userSelected);
                                 })
@@ -141,7 +142,7 @@ class ReportController extends Controller
                                 ->get();
 
         } else if ($request->type_maintenance == 2) {
-            $maintenances = OtherMaintenance::whereBetween('date_of_realization', [ 
+            $maintenances = OtherMaintenance::whereBetween('date_of_realization_ending', [ 
                                         $request->initial_date, $request->final_date
                                 ])
                                 ->when($request->user_selected, function ($query, $userSelected) {
@@ -150,17 +151,17 @@ class ReportController extends Controller
                                 ->whereHas('device.group', function (Builder $query) use ($request) {
                                     $query->where('id', $request->group);
                                 })
-                                ->orderBy('date_of_realization', 'desc')
+                                ->orderBy('date_of_realization_ending', 'desc')
                                 ->get();
         } else {
-            $maintenances = OtherMaintenance::whereBetween('date_of_realization', [ 
+            $maintenances = OtherMaintenance::whereBetween('date_of_realization_ending', [ 
                                         $request->initial_date, $request->final_date
                                 ])
                                 ->whereDoesntHave('device')
                                 ->when($request->user_selected, function ($query, $userSelected) {
                                     return $query->where('user_id', $userSelected);
                                 })
-                                ->orderBy('date_of_realization', 'desc')
+                                ->orderBy('date_of_realization_ending', 'desc')
                                 ->get();
         }
 

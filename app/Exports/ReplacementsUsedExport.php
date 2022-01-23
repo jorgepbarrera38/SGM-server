@@ -18,7 +18,7 @@ class ReplacementsUsedExport implements FromView
     public function view(): View
     {
            $replacementsUsed = ReplacementMaintenance::whereHas('replacementMaintenancable', function (Builder $query) {
-                                            $query->whereBetween('date_of_realization', [$this->initial_date, $this->final_date]);
+                                            $query->whereBetween('date_of_realization_ending', [$this->initial_date, $this->final_date]);
                                         })
                                         ->orderBy('created_at', 'desc')
                                         ->with('replacementMaintenancable.user:id,names')
