@@ -6,22 +6,24 @@ use App\Models\Replacement;
 use App\Models\Company;
 use App\Models\Location;
 use App\Models\Dependence;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Storage;
 
     function periodIsActive ($date_of_realization_ending) {
         return Period::where('start', '<=', $date_of_realization_ending)
-                        ->where('end', '>=', $date_of_realization_ending)
+                        //->where('end', '>=', $date_of_realization_ending)
+                        ->where('end', '>=', Carbon::parse($date_of_realization_ending)->toDateString())
                         ->where('active', true)
                         ->count();
-        
+
     }
 
     function replacementsHasErrors ($replacements) {
-        $rules = [ 
+        $rules = [
             '*.quantity' => 'required|numeric|min:1|max:100',
             '*.replacement_id' => 'required|exists:replacements,id',
         ];
-        
+
         $validator = \Validator::make($replacements, $rules);
 
         if (!$validator->passes()) {
@@ -29,7 +31,7 @@ use Illuminate\Support\Facades\Storage;
         }
         return false;
     }
-    
+
     function getDataForReportDigitalToGeneralMaintenancesAndOthers($request, $replacements, $device = null) {
         $typeMaintenance = TypeOtherMaintenance::findOrFail($request->type_maintenance_id);
         $companyLogo = Company::first()->logo;
@@ -51,11 +53,12 @@ use Illuminate\Support\Facades\Storage;
         return [
             'companyLogo' => $companyLogo,
             'date_of_realization_ending' => $request->date_of_realization_ending,
-            'typeMaintenance' => $typeMaintenance, 
+            'typeMaintenance' => $typeMaintenance,
             'reason' => $request->reason,
             'conclusion' => $request->conclusion,
             'replacementsFromReport' => $replacementsFromReport,
             'device' => $device,
+            'photographicAnnexes' => $request->photographicAnnexes ? array_chunk($request->photographicAnnexes, 2) : [],
             'signature' => $request->signature,
             'official_names' => $request->official_names,
             'official_position' => $request->official_position,

@@ -21,7 +21,7 @@ class PreventiveMaintenanceController extends Controller
         $this->middleware('has.permission:preventive-maintenances.create')->only(['store']);
         $this->middleware('has.permission:preventive-maintenances.edit')->only(['update']);
         $this->middleware('has.permission:preventive-maintenances.destroy')->only(['destroy']);
-        
+
     }
 
     public function getDataToCreatePreventiveMaintenance (Device $device) {
@@ -35,8 +35,7 @@ class PreventiveMaintenanceController extends Controller
 
     public function store(PreventiveMaintenanceRequest $request, Device $device)
     {
-        /*$datos = array_chunk($request->photographicAnnexes, 2);
-        return response()->json(['errors' => ['message' => $datos]], 422);*/
+        //return response()->json(['errors' => ['message' => ]], 422);
         //Validando que los repuestos existan y tengan cantidades
         $replacements = json_decode($request->replacementsInJson, true);
         if ($errors = replacementsHasErrors($replacements)) {
@@ -63,8 +62,8 @@ class PreventiveMaintenanceController extends Controller
 
         if (!$hasPermissionInGroup) {
             return response()->json(['errors' => ['message' => ['El usuario no está autorizado en el grupo del dispositivo']]], 422);
-        }    
-        
+        }
+
         //Verificando si el reporte es digital=1 o físico=2 para generar o guardar el pdf
         if ($request->type_report == 1) {
             //Verificando si el usuario tiene firma
@@ -97,12 +96,12 @@ class PreventiveMaintenanceController extends Controller
                                                               ->first();
 
         if (!$scheduleMaintenanceDetail) {
-            return response()->json(['errors' => ['message' => ['El dispositivo no tiene programación de mantenimiento preventivo para la fecha y hora de finalización dada']]], 422);   
+            return response()->json(['errors' => ['message' => ['El dispositivo no tiene programación de mantenimiento preventivo para la fecha y hora de finalización dada']]], 422);
         }
 
         //Verificando que el preventivo no haya sido realizado con anterioridad
         if ($scheduleMaintenanceDetail->made) {
-            return response()->json(['errors' => ['message' => ['El dispositivo ya tiene registrado el mantenimiento preventivo para la fecha dada']]], 422);   
+            return response()->json(['errors' => ['message' => ['El dispositivo ya tiene registrado el mantenimiento preventivo para la fecha dada']]], 422);
         }
 
         \DB::transaction(function () use($device, $request, $pathEvidence, $replacements, $scheduleMaintenanceDetail) {
@@ -115,16 +114,16 @@ class PreventiveMaintenanceController extends Controller
                 'dependence_id' => $device->dependence_id,
                 'user_id' => auth()->user()->id
             ]);
-                
+
             //Registrando los repuestos
             $preventiveMaintenance->replacementMaintenancables()->createMany($replacements);
-                
-            //Actualizando en la programación el estado y la relación del mantenimiento preventivo realizado 
+
+            //Actualizando en la programación el estado y la relación del mantenimiento preventivo realizado
             $scheduleMaintenanceDetail->made = true;
             $scheduleMaintenanceDetail->preventive_maintenance_id = $preventiveMaintenance->id;
             $scheduleMaintenanceDetail->save();
         });
-        
+
     }
 
     /**
@@ -136,7 +135,7 @@ class PreventiveMaintenanceController extends Controller
     public function show($preventiveMaintenance)
     {
         $preventiveMaintenance = PreventiveMaintenance::with('replacementMaintenancables.replacement')->where('id', $preventiveMaintenance)->firstOrFail();
-        $description_support_preventive_maintenance = $preventiveMaintenance->device->description_support_preventive_maintenance;   
+        $description_support_preventive_maintenance = $preventiveMaintenance->device->description_support_preventive_maintenance;
         $replacements = Replacement::orderBy('name')->get(['id', 'name']);
         return [
             'date_of_realization' => $preventiveMaintenance->date_of_realization,
@@ -156,7 +155,7 @@ class PreventiveMaintenanceController extends Controller
      */
     public function update(PreventiveMaintenanceRequest $request, PreventiveMaintenance $preventiveMaintenance)
     {
-        
+
         //Validando que los repuestos existan y tengan cantidades
         $replacements = json_decode($request->replacementsInJson, true);
         if ($errors = replacementsHasErrors($replacements)) {
@@ -183,8 +182,8 @@ class PreventiveMaintenanceController extends Controller
 
         if (!$hasPermissionInGroup) {
             return response()->json(['errors' => ['message' => ['El usuario no está autorizado en el grupo del dispositivo']]], 422);
-        }    
-        
+        }
+
         //Verificando si el reporte es digital=1 o físico=2 para generar o guardar el pdf
         if ($request->type_report == 1) {
             //Verificando si el usuario tiene firma
@@ -219,16 +218,16 @@ class PreventiveMaintenanceController extends Controller
                                                               ->first();
 
         if (!$scheduleMaintenanceDetail) {
-            return response()->json(['errors' => ['message' => ['El dispositivo no tiene programación de mantenimiento preventivo para la fecha y hora de finalización dada']]], 422);   
+            return response()->json(['errors' => ['message' => ['El dispositivo no tiene programación de mantenimiento preventivo para la fecha y hora de finalización dada']]], 422);
         }
-        
+
         //Verificando que el preventivo no haya sido realizado con anterioridad
         /*if ($scheduleMaintenanceDetail->made) {
-            return response()->json(['errors' => ['message' => ['El dispositivo ya tiene registrado el mantenimiento preventivo para la fecha dada']]], 422);   
+            return response()->json(['errors' => ['message' => ['El dispositivo ya tiene registrado el mantenimiento preventivo para la fecha dada']]], 422);
         }*/
 
         $pathEvidencePrevious = $preventiveMaintenance->evidence;
-        
+
 
         \DB::transaction(function () use ($preventiveMaintenance, $pathEvidence, $request, $replacements, $scheduleMaintenanceDetail) {
             //Actualizando el preventivo
@@ -238,12 +237,12 @@ class PreventiveMaintenanceController extends Controller
             $preventiveMaintenance->location_id = $preventiveMaintenance->device->location_id;
             $preventiveMaintenance->dependence_id = $preventiveMaintenance->device->dependence_id;
             $preventiveMaintenance->update();
-    
+
             //Actualizando los repuestos los repuestos
             $preventiveMaintenance->replacementMaintenancables()->delete();
             $preventiveMaintenance->replacementMaintenancables()->createMany($replacements);
 
-            //Actualizando en la programación el estado y la relación del mantenimiento preventivo realizado 
+            //Actualizando en la programación el estado y la relación del mantenimiento preventivo realizado
             $scheduleMaintenanceDetail->made = true;
             $scheduleMaintenanceDetail->preventive_maintenance_id = $preventiveMaintenance->id;
             $scheduleMaintenanceDetail->save();
@@ -255,7 +254,7 @@ class PreventiveMaintenanceController extends Controller
         }
 
 
-        
+
     }
 
     /**
@@ -268,12 +267,12 @@ class PreventiveMaintenanceController extends Controller
     {
         //Verificnado que solo pueda eliminar el que haya registrado el preventivo
         if (auth()->user()->id == $preventiveMaintenance->user_id) {
-            
+
             //Eliminando el archivo de evidencia pdf generado
             if (Storage::exists($preventiveMaintenance->evidence)) {
                 Storage::delete($preventiveMaintenance->evidence);
             }
-            
+
             //Eliminando la relación el detalle del cronograma
             if ($preventiveMaintenance->scheduleMaintenanceDetail) {
                 $preventiveMaintenance->scheduleMaintenanceDetail()->update([
@@ -284,7 +283,7 @@ class PreventiveMaintenanceController extends Controller
 
             return $preventiveMaintenance->delete();
         }
-        
+
         return abort(403);
     }
 }
