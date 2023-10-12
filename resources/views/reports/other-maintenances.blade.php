@@ -30,11 +30,11 @@
             <td>{{ $otherMaintenance->dependence->name }}</td>  
             <td>{{ $otherMaintenance->typeOtherMaintenance->name }}</td>
             <td>{{ $otherMaintenance->reason }}</td>
-            <td>{{ $otherMaintenance->conclusion }}</td>
+            <td>{{ $otherMaintenance->support_description }}</td>
             <td>{{ $otherMaintenance->failureMode ? $otherMaintenance->failureMode->name : '' }}</td>
             <td>{{ $otherMaintenance->user->names }}</td>
             <td>
-                @foreach ($otherMaintenance->replacementMaintenancables as $replacement )
+                @foreach ($otherMaintenance->replacements as $replacement )
                     {{ $replacement->replacement->name . ' - cantidad:' . $replacement->quantity }} 
                     @if (!$loop->last)
                         <br>

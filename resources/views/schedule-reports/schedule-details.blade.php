@@ -1,6 +1,7 @@
 <table>
     <thead>
     <tr>
+        <th><strong>GRUPO</strong></th>
         <th><strong>DESCRIPCIÓN</strong></th>
         <th><strong>ELEMENTO</strong></th>
         <th><strong>H.V</strong></th>
@@ -16,9 +17,10 @@
     <tbody>
         @foreach ($scheduleMaintenance->scheduleMaintenanceDetails as $scheduleMaintenanceDetail)
         <tr>
+            <td>{{ $scheduleMaintenanceDetail->device->group->name }}</td>
             <td>{{ $scheduleMaintenanceDetail->device->description }}</td>
             <td>{{ $scheduleMaintenanceDetail->device->element->name }}</td>
-            <td>{{ $scheduleMaintenanceDetail->device->id }}</td>
+            <td>{{ $scheduleMaintenanceDetail->device->resume_number }}</td>
             <td>{{ $scheduleMaintenanceDetail->device->internal_code }}</td>
             <td>{{ $scheduleMaintenanceDetail->device->serial_number }}</td>
             <td>{{ $scheduleMaintenanceDetail->device->location->name }}</td>

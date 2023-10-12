@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use LynX39\LaraPdfMerger\Facades\PdfMerger;
 use App\Models\Device;
 use App\Models\Group;
 use App\Models\Element;
@@ -152,7 +153,7 @@ class DeviceController extends Controller
             'brand_id' => 'Marca',
             'model' => 'Modelo',
             'description' => 'Descripción',
-            'observations' => 'Observaciónes',
+            'observations' => 'Observaciones',
             'start_operation' => 'Inicio de operación',
             'date_end_guarantee' => 'Fecha fin de garantía',
             'useful_life' => 'Vida útil',
@@ -214,18 +215,18 @@ class DeviceController extends Controller
                                         }])
 
                                         ->with('preventiveMaintenances.user')
-                                        ->with('preventiveMaintenances.replacementMaintenancables.replacement')
+                                        ->with('preventiveMaintenances.replacements.replacement')
 
                                         ->with(['preventiveMaintenances' => function ($query) {
-                                            $query->orderBy('date_of_realization', 'desc');
+                                            $query->orderBy('date_of_realization_ending', 'desc');
                                         }])
 
                                         ->with('otherMaintenances.user')
                                         ->with('otherMaintenances.typeOtherMaintenance:id,name')
-                                        ->with('otherMaintenances.replacementMaintenancables.replacement')
+                                        ->with('otherMaintenances.replacements.replacement')
 
                                         ->with(['otherMaintenances' => function ($query) {
-                                            $query->orderBy('date_of_realization', 'desc');
+                                            $query->orderBy('date_of_realization_ending', 'desc');
                                         }])
                                         ->with('documents.user:id,names')
                                         ->with('documents.typeDocument:id,name')
@@ -262,7 +263,7 @@ class DeviceController extends Controller
     public function update(Request $request, Device $device)
     {
         $data = $request->validate([
-            'group_id' => 'required|exists:groups,id',
+            //'group_id' => 'required|exists:groups,id',
             'element_id' => 'required|exists:elements,id',
             'serial_number' => 'required|max:40|unique:devices,serial_number,' . $device->id,
             'brand_id' => 'required|exists:brands,id',
@@ -280,7 +281,7 @@ class DeviceController extends Controller
             'brand_id' => 'Marca',
             'model' => 'Modelo',
             'description' => 'Descripción',
-            'observations' => 'Observaciónes',
+            'observations' => 'Observaciones',
             'start_operation' => 'Inicio de operación',
             'date_end_guarantee' => 'Fecha fin de garantía',
             'useful_life' => 'Vida útil',
@@ -453,8 +454,100 @@ class DeviceController extends Controller
     }
 
     public function getResume (Device $device) {
-        $company = Company::firstOrFail();
-        $pdf = \PDF::loadView('resume.resume', ['device' => $device, 'companyLogo' => $company->logo])->setPaper('letter');
-        return $pdf->download();
+
+        //Generando archivo temporal de especificaciónes técnicas
+        $company = Company::first();
+        $pdf = \PDF::loadView('resume.resume', ['device' => $device, 'company' => $company])->setPaper('letter');
+        $pathEspecifications = 'temps/especifications-temp.pdf';
+        Storage::put($pathEspecifications, $pdf->output());
+        
+        //Uniendo
+        $pdfMerger = PdfMerger::init();
+
+        //Agregando archivo temporal de especificaciónes técnicas
+        $pdfMerger->addPDF(public_path() . '/files/temps/especifications-temp.pdf', 'all');
+
+        
+        $tempsFilesToDelete = [];
+        
+        //Generando hoja de título de mantenimientos preventivos
+        $pdf = \PDF::loadView('resume.preventive-maintenance-title')->setPaper('letter');
+        $pathPreventiveMaintenanceTitle = 'temps/preventive-maintenance-title-temp.pdf';
+        Storage::put($pathPreventiveMaintenanceTitle, $pdf->output());
+
+        
+        $pdfMerger->addPDF(public_path() . '/files/' . $pathPreventiveMaintenanceTitle, 'all');
+        
+        //Agregando evidencias de preventivos
+        
+        foreach ($device->preventiveMaintenances()->orderBy('date_of_realization_ending', 'desc')->get() as $key => $preventiveMaintenance) {
+            
+            //Si es digital arma el pdf con dompdf
+            if ($preventiveMaintenance->type == 'Digital') {
+
+                $pdf = \PDF::loadView('resume.general-maintenances-preventives-and-others', ['device' => $device, 'maintenance' => $preventiveMaintenance, 'company' => $company])->setPaper('letter');
+
+                //Guardando el temporal del preventivo
+                $pathPreventiveTemp = '/temps/preventive-temp'. $key . '.pdf';
+                Storage::put($pathPreventiveTemp, $pdf->output());
+
+                //Anexándolo al pdf final
+                $pdfMerger->addPDF(public_path() . '/files/' . $pathPreventiveTemp, 'all');
+                
+                $tempsFilesToDelete[] = $pathPreventiveTemp;
+
+            } else {
+                //Si no es digital llama el documento que se adjuntó como evidencia del preventivo
+                $pdfMerger->addPDF(public_path() . '/files/' . $preventiveMaintenance->evidence, 'all');
+
+            }
+        }        
+
+        //Generando hoja de título de otros mantenimientos
+        $pdf = \PDF::loadView('resume.other-maintenance-title')->setPaper('letter');
+        $pathOtherMaintenanceTitle = 'temps/other-maintenance-title-temp.pdf';
+        Storage::put($pathOtherMaintenanceTitle, $pdf->output());
+
+        
+        $pdfMerger->addPDF(public_path() . '/files/' . $pathOtherMaintenanceTitle, 'all');
+        //Agregando evidencias de otros mantenimientos
+        foreach ($device->otherMaintenances()->orderBy('date_of_realization_ending', 'desc')->get() as $key => $otherMaintenance) {
+            
+            //Si es digital arma el pdf con dompdf
+            if ($otherMaintenance->type == 'Digital') {
+                
+                $pdf = \PDF::loadView('resume.general-maintenances-preventives-and-others', ['device' => $device, 'maintenance' => $otherMaintenance, 'company' => $company])->setPaper('letter');
+                
+                //Guardando el temporal del otro mantenimiento
+                $pathOtherTemp = 'temps/other-temp'. $key . '.pdf';
+                Storage::put($pathOtherTemp, $pdf->output());
+
+                //Anexándolo al pdf final
+                $pdfMerger->addPDF(public_path() . '/files/' . $pathOtherTemp, 'all');
+                
+                $tempsFilesToDelete[] = $pathOtherTemp;
+
+            } else {
+                //Si no es digital llama el documento que se adjuntó como evidencia del otro mantenimiento
+                $pdfMerger->addPDF(public_path() . '/files/' . $otherMaintenance->evidence, 'all');
+
+            }
+        }
+
+        //Uniendo todas las hojas
+        $pdfMerger->merge();
+
+        //Guardando el archivo final temporal
+        $pdfMerger->save(public_path() . '/files/temps/resume-temp.pdf', 'file');
+
+        //Elminando archivo temporal de especificaciones
+        Storage::delete($pathEspecifications);
+
+        //Elminando archivos temporales generados
+        foreach ($tempsFilesToDelete as $tempFileToDelete) {
+            Storage::delete($tempFileToDelete);
+        }
+
+        return response()->file(public_path() . '/files/temps/resume-temp.pdf');
     }
 }

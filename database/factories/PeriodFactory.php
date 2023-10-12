@@ -22,9 +22,9 @@ class PeriodFactory extends Factory
     public function definition()
     {
         return [
-            'name' => 'Marzo 2021',
-            'start' => '2021-03-01',
-            'end' => '2021-03-31',
+            'name' => 'Abril 2022',
+            'start' => '2022-01-01',
+            'end' => '2022-12-31',
         ];
     }
 }

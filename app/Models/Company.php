@@ -11,6 +11,7 @@ class Company extends Model
 
     protected $fillable = [
         'logo',
+        'watermark',
         'reason_preventive_maintenance_report_digital',
         'complement_title',
     ];

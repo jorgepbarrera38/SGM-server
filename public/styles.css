@@ -1,5 +1,5 @@
 .title {
-  background-color: #e8e8e8
+  background-color: rgba(232, 232, 232, 0.4);
 }
 .sub-title {
   background-color: #e8e8e8
@@ -90,3 +90,30 @@ th {
   .table-responsive > .table-bordered {
     border: 0;
   }
+
+  .page-break {
+    page-break-after: always;
+}
+
+ /** 
+    * Defina el ancho, alto, márgenes y posición de la marca de agua.
+    **/
+    #watermark {
+        position: fixed;
+
+        /** 
+            Establece una posición en la página para tu imagen
+            Esto debería centrarlo verticalmente
+        **/
+        bottom:   5.7cm;
+        left:     2.6cm;
+
+        /** Cambiar las dimensiones de la imagen **/
+        width:    14cm;
+        height:   14cm;
+
+        /** Tu marca de agua debe estar detrás de cada contenido **/
+        z-index:  -1000;
+
+        opacity: 0.2;
+    }

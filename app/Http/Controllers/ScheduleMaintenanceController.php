@@ -2,16 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use LynX39\LaraPdfMerger\Facades\PdfMerger;
 use App\Models\Device;
 use App\Models\Group;
 use App\Models\Element;
 use App\Models\Location;
+use App\Models\Company;
 use App\Models\ScheduleMaintenance;
 use App\Models\ScheduleMaintenanceDetail;
 use App\Models\RecordScheduleMaintenance;
 use App\Models\RecordDelScheduleMaintenance;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Storage;
 use Carbon\Carbon;
 use App\Http\Requests\ScheduleRequest;
 
@@ -43,7 +46,17 @@ class ScheduleMaintenanceController extends Controller
     public function getDataToCreateScheduleMaintenance () {
         $groups = Group::orderBy('name')->get(['id', 'name']);
         $elements = Element::orderBy('name')->get();
-        $locationsWithDevices = Location::orderBy('name')
+        /*$locationsWithDevices = Location::orderBy('name')
+                        ->with('devices.group:id,name')
+                        ->with('devices.dependence')
+                        ->with('devices.location')
+                        ->with('devices.element')
+                        ->with(['devices' => function ($query) {
+                            $query->where('active', 1)->orderBy('dependence_id', 'asc')->get();
+                        }])
+                        ->get(['id', 'name']);*/
+
+        $groupsWithDevices = Group::orderBy('name')
                         ->with('devices.group:id,name')
                         ->with('devices.dependence')
                         ->with('devices.location')
@@ -52,9 +65,10 @@ class ScheduleMaintenanceController extends Controller
                             $query->where('active', 1)->orderBy('dependence_id', 'asc')->get();
                         }])
                         ->get(['id', 'name']);
+            
 
         return [
-            $groups, $elements, $locationsWithDevices
+            $groups, $elements, $groupsWithDevices
         ];
 
     }
@@ -201,6 +215,55 @@ class ScheduleMaintenanceController extends Controller
     public function exportExcel($scheduleMaintenance) {
         return \Excel::download(new \App\Exports\ScheduleExport($scheduleMaintenance), 'invoices.xlsx');
         return $scheduleMaintenance;
+    }
+
+    public function exportPdf(ScheduleMaintenance $scheduleMaintenance) {
+        $company = Company::first();
+
+        $pdfMerger = PdfMerger::init(); //Initialize the merger
+        $tempsFilesToDelete = [];
+
+
+        foreach ($scheduleMaintenance->scheduleMaintenanceDetails as $key => $scheduleMaintenanceDetail) {
+
+            if ($scheduleMaintenanceDetail->made) {
+                $preventiveMaintenance = $scheduleMaintenanceDetail->preventiveMaintenance;
+
+                //Si es digital arma el pdf con dompdf
+                if ($preventiveMaintenance->type == 'Digital') {
+
+                    $pdf = \PDF::loadView('resume.general-maintenances-preventives-and-others', ['device' => $preventiveMaintenance->device, 'maintenance' => $preventiveMaintenance, 'company' => $company])->setPaper('letter');
+                    
+                    //Guardando el temporal del preventivo
+                    $pathPreventiveTemp =  '/temps/preventive-temp' . $key . '.pdf';
+                    Storage::put($pathPreventiveTemp, $pdf->output());
+
+                    //Anexándolo al pdf final
+                    $pdfMerger->addPDF(public_path() . '/files/' . $pathPreventiveTemp, 'all');
+                    
+                    $tempsFilesToDelete[] = $pathPreventiveTemp;
+
+                } else {
+                    //Si no es digital llama el documento que se adjuntó como evidencia del preventivo
+                    $pdfMerger->addPDF(public_path() . '/files/' . $preventiveMaintenance->evidence, 'all');
+
+                }
+
+            }
+        }
+
+        //Uniendo todas las hojas
+        $pdfMerger->merge();
+
+        //Guardando el archivo final temporal
+        $pdfMerger->save(public_path() . '/files/temps/schedule-maintenances-temp.pdf', 'file');
+
+        //Elminando archivos temporales generados
+        foreach ($tempsFilesToDelete as $tempFileToDelete) {
+            Storage::delete($tempFileToDelete);
+        }
+
+        return response()->file(public_path() . '/files/temps/schedule-maintenances-temp.pdf');
     }
 
     public function  rescheduleDetail (Request $request, ScheduleMaintenanceDetail $scheduleMaintenanceDetail) {

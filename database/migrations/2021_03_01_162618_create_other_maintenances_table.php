@@ -15,18 +15,24 @@ class CreateOtherMaintenancesTable extends Migration
     {
         Schema::create('other_maintenances', function (Blueprint $table) {
             $table->id();
+            $table->enum('type', ['Digital', 'Físico']);
             $table->unsignedBigInteger('device_id')->nullable();
             $table->foreign('device_id')->references('id')->on('devices');
+            $table->unsignedBigInteger('group_id')->nullable();
+            $table->foreign('group_id')->references('id')->on('groups');
             $table->date('date_of_realization');
             $table->unsignedBigInteger('type_other_maintenance_id');
             $table->foreign('type_other_maintenance_id')->references('id')->on('type_other_maintenances');
-            $table->text('reason');
-            $table->text('conclusion');
+            $table->text('reason')->nullable();
+            $table->text('support_description')->nullable();
+            $table->string('evidence')->nullable();
             $table->unsignedBigInteger('location_id');
             $table->foreign('location_id')->references('id')->on('locations');
             $table->unsignedBigInteger('dependence_id');
             $table->foreign('dependence_id')->references('id')->on('dependences');
-            $table->string('evidence');
+            $table->string('official_names')->nullable();
+            $table->string('official_position')->nullable();
+            $table->text('signature')->nullable();
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');
             $table->timestamps();

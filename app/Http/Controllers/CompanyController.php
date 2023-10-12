@@ -36,6 +36,7 @@ class CompanyController extends Controller
     {
         $request->validate([
             'logo' => 'nullable|mimes:jpg,jpeg',
+            'watermark' => 'nullable|mimes:jpg,jpeg',
             'reason_preventive_maintenance_report_digital' => 'required|max:500',
             'complement_title' => 'nullable|max:15',
         ], [], [
@@ -46,7 +47,11 @@ class CompanyController extends Controller
 
         if ($request->hasFile('logo')) {
             $pathLogo = Storage::putFile('company', $request->logo);
-        }        
+        }   
+
+        if ($request->hasFile('watermark')) {
+            $pathWatermark = Storage::putFile('company', $request->watermark);
+        }   
 
         if ($company = Company::first()) {
 
@@ -57,6 +62,15 @@ class CompanyController extends Controller
                     }
                 }
                 $company->logo = $pathLogo;
+            }
+
+            if ($request->hasFile('watermark')) {
+                if ($company->watermark) {
+                    if (Storage::exists($company->watermark)) {
+                        Storage::delete($company->watermark);
+                    }
+                }
+                $company->watermark = $pathWatermark;
             }
     
             $company->reason_preventive_maintenance_report_digital = $request->reason_preventive_maintenance_report_digital;
@@ -70,6 +84,11 @@ class CompanyController extends Controller
             if ($request->hasFile('logo')) {
                 $company->logo = $pathLogo;
             }
+
+            if ($request->hasFile('pathWatermark')) {
+                $company->pathWatermark = $pathWatermark;
+            }
+
             $company->save();
         }
 

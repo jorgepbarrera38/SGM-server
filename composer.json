@@ -11,6 +11,7 @@
         "php": "^7.3|^8.0",
         "barryvdh/laravel-dompdf": "^0.9.0",
         "crazybooot/base64-validation": "^1.0",
+        "daltcore/lara-pdf-merger": "^2.0",
         "doctrine/dbal": "^3.3",
         "dompdf/dompdf": "^1.0",
         "fideloper/proxy": "^4.4",
@@ -19,7 +20,6 @@
         "laravel/framework": "^8.12",
         "laravel/tinker": "^2.5",
         "maatwebsite/excel": "^3.1",
-        "rguedes/pdfmerger": "^1.0",
         "tymon/jwt-auth": "^1.0"
     },
     "require-dev": {

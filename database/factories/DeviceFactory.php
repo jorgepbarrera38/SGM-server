@@ -29,6 +29,7 @@ class DeviceFactory extends Factory
     public function definition()
     {
         return [
+//            'resume_number' => Device::orderBy('resume_number', 'desc')->first()->resume_number + 1,
             'group_id' => Group::inRandomOrder()->first()->id,
             'element_id' => Element::inRandomOrder()->first()->id,
             'location_id' => Location::inRandomOrder()->first()->id,

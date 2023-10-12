@@ -10,7 +10,9 @@ class ScheduleMaintenanceDetail extends Model
     use HasFactory;
 
     protected $fillable = [
+        'preventive_maintenance_id',
         'device_id',
+        'made',
         'date'
     ];
 

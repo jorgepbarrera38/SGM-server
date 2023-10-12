@@ -35,8 +35,8 @@ class OtherMaintenanceRequest extends FormRequest
             'date_of_realization' => 'required|date',
             'date_of_realization_ending' => 'required|date|after_or_equal:date_of_realization',
             'type_maintenance_id' => 'required|exists:type_other_maintenances,id',
-            'reason' => 'required|max:400',
-            'conclusion' => 'required|max:400',
+            'reason' => 'required_if:type_report,1|nullable|max:600',
+            'support_description' => 'required_if:type_report,1|nullable|max:10000',
             'failure_mode_id' => 'required|exists:failure_modes,id',
             'location_id' => [ Rule::requiredIf($this->route()->named('maintenances.store')), 'exists:locations,id'],
             'dependence_id' => [ Rule::requiredIf($this->route()->named('maintenances.store')), 'exists:dependences,id'],
@@ -49,6 +49,8 @@ class OtherMaintenanceRequest extends FormRequest
 
     public function messages () {
         return [
+            'reason.required_if' => 'El campo Motivo es obligatorio cuando el campo Tipo es Digital.',
+            'support_description.required_if' => 'El campo Descripción del soporte es obligatorio cuando el campo Tipo es Digital.',
             'evidence.required_if' => 'El campo evidencia es obligatorio',
             'official_names.required_if' => 'El campo funcionario es obligatorio',
             'official_position.required_if' => 'El campo cargo es obligatorio',
@@ -64,7 +66,7 @@ class OtherMaintenanceRequest extends FormRequest
             'type_maintenance_id' => 'Clasificación del servicio',
             'failure_mode_id' => 'Modo de falla',
             'reason' => 'Motivo',
-            'conclusion' => 'Conclusión',
+            'support_description' => 'Descripción del soporte',
             'evidence' => 'Evidencia',
             'official_names' => 'Funcionario',
             'official_position' => 'Cargo',

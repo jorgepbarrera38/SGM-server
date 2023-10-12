@@ -94,7 +94,7 @@ class DocumentController extends Controller
         if (auth()->user()->id == $document->user_id) {
 
             //Verificando que el usuario esté autorizado en el grupo del dispositivo
-            $hasPermissionInGroup = auth()->user()->groups()->where('groups.id', $device['group_id'])->first();
+            $hasPermissionInGroup = auth()->user()->groups()->where('groups.id', $document->device['group_id'])->first();
 
             if (!$hasPermissionInGroup) {
                 return response()->json(['errors' => ['message' => ['El usuario no está autorizado en el grupo del dispositivo']]], 422);

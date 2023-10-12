@@ -17,6 +17,13 @@ use App\Models\Responsible;
 |
 */
 
+Route::get('parameters', function () {
+    $APP_URL = env('APP_URL');
+    return [
+        'APP_URL' => $APP_URL,
+    ];
+});
+
 Route::middleware('auth')->group(function () {
 
         Route::get('dashboard/get-quantities', function () {
@@ -54,13 +61,20 @@ Route::middleware('auth')->group(function () {
         Route::post('movements/{device}', 'MovementController@store');
         Route::get('movements/get-data-to-create-movement/{device}', 'MovementController@getDataToCreateMovement');
         
-        Route::get('preventive-maintenances/{preventiveMaintenance}', 'PreventiveMaintenanceController@show');
+        Route::post('preventive-maintenances/get-blob-from-photographic-annexe', function (Request $request) {
+            $imageInBlob = file_get_contents(public_path() . '/files/' . $request->image);
+            return $imageInBlob;
+        });
+
+        Route::get('preventive-maintenances/{preventiveMaintenance}/edit', 'PreventiveMaintenanceController@edit');
         Route::put('preventive-maintenances/{preventiveMaintenance}', 'PreventiveMaintenanceController@update')->name('preventives.update');
         
         Route::get('preventive-maintenances/{device}/get-data-to-create-preventive-maintenance', 'PreventiveMaintenanceController@getDataToCreatePreventiveMaintenance');
         
         Route::post('preventive-maintenances/{device}', 'PreventiveMaintenanceController@store');
         Route::delete('preventive-maintenances/{preventiveMaintenance}', 'PreventiveMaintenanceController@destroy');
+
+        Route::get('preventive-maintenances/{preventiveMaintenance}/get-evidence-from-preventive-maintenance', 'PreventiveMaintenanceController@getEvidenceFromPreventiveMaintenance');
         
         Route::apiResource('type-other-maintenances', 'TypeOtherMaintenanceController');
         
@@ -69,6 +83,7 @@ Route::middleware('auth')->group(function () {
         Route::post('other-maintenances/{device}', 'OtherMaintenanceController@store');
         Route::put('other-maintenances/{otherMaintenance}', 'OtherMaintenanceController@update')->name('otherMaintenances.update');
         Route::delete('other-maintenances/{otherMaintenance}', 'OtherMaintenanceController@destroy');
+        Route::get('other-maintenances/{otherMaintenance}/get-evidence-from-other-maintenance', 'OtherMaintenanceController@getEvidenceFromOtherMaintenance');
         
         Route::get('documents/get-data-to-create-document', 'DocumentController@getDataToCreateDocument');
         Route::post('documents/{device}', 'DocumentController@store');
@@ -79,6 +94,7 @@ Route::middleware('auth')->group(function () {
         Route::get('schedule-maintenances', 'ScheduleMaintenanceController@index');
         Route::get('schedule-maintenances/get-data-to-create-schedule-maintenance', 'ScheduleMaintenanceController@getDataToCreateScheduleMaintenance');
         Route::get('schedule-maintenances/{scheduleMaintenance}/export-excel', 'ScheduleMaintenanceController@exportExcel');
+        Route::get('schedule-maintenances/{scheduleMaintenance}/export-pdf', 'ScheduleMaintenanceController@exportPdf');
         Route::get('schedule-maintenances/{scheduleMaintenance}', 'ScheduleMaintenanceController@show');
         Route::post('schedule-maintenances', 'ScheduleMaintenanceController@store');
         Route::delete('schedule-maintenances/{scheduleMaintenance}', 'ScheduleMaintenanceController@destroy');
@@ -110,6 +126,16 @@ Route::middleware('auth')->group(function () {
         Route::apiResource('type-documents', 'TypeDocumentController');
 
         Route::apiResource('failure-modes', 'FailureModeController');
+
+        Route::get('checklists', 'ChecklistController@index')->name('checklists.index');
+        Route::get('checklists/{checklist}/edit', 'ChecklistController@edit')->name('checklists.edit');
+        Route::post('checklists', 'ChecklistController@store')->name('checklists.store');
+        Route::delete('checklists/{checklist}', 'ChecklistController@destroy')->name('checklists.destroy');
+        Route::post('checklists/{checklist}/add-group', 'ChecklistController@addGroup')->name('checklists.addGroup');
+        Route::post('checklists/{checklist}/add-item', 'ChecklistController@addItem')->name('checklists.addItem');
+        Route::delete('checklists/{checklistItem}/delete-item', 'ChecklistController@deleteItem')->name('checklists.deleteItem');
+        Route::delete('checklists/{checklistGroup}/delete-group', 'ChecklistController@deleteGroup')->name('checklists.deleteGroup');
+        Route::put('checklists/{checklist}/update-checklist', 'ChecklistController@updateChecklist')->name('checklists.updateChecklist');
 
 });
 

@@ -1,43 +1,39 @@
 <table>
     <thead>
     <tr>
+        <th><strong>TIPO DE MANTENIMIENTO</strong></th>
         <th><strong>FECHA</strong></th>
         <th><strong>REPUESTO - CONSUMIBLE</strong></th>
         <th><strong>CANTIDAD</strong></th>
-        <th><strong>TIPO DE MANTENIMIENTO</strong></th>
-        <th><strong>CLASIFICACIÓN DEL SERVICIO</strong></th>
         <th><strong>ELEMENTO</strong></th>
         <th><strong>PLACA</strong></th>
         <th><strong>SERIE</strong></th>
         <th><strong>MOTIVO</strong></th>
-        <th><strong>CONCLUSIÓN</strong></th>
+        <th><strong>DESCRIPCIÓN DEL SOPORTE</strong></th>
     </tr>
     </thead>
     <tbody>
     @foreach($replacementsUsed as $replacementUsed)
         <tr>
-            <td>{{ $replacementUsed->replacementMaintenancable->date_of_realization_ending }}</td>
-            <td>{{ $replacementUsed->replacement->name }}</td>
-            <td>{{ $replacementUsed->quantity }}</td>
             <td>
-                @if (!$replacementUsed->replacementMaintenancable->device_id)
-                    Mantenimiento general
-                
-                @elseif(str_contains($replacementUsed->replacement_maintenancable_type, 'Other'))
-                    Otro Mantenimiento
-                @else
+                @if($replacementUsed->type == 'preventive_maintenance')
                     Mantenimiento preventivo
                 @endif
+                @if($replacementUsed->type == 'other_maintenance')
+                    Otro mantenimiento
+                @endif
+                @if($replacementUsed->type == 'general_maintenance')
+                    Mantenimiento general
+                @endif
             </td>
-            <td>
-                {{ $replacementUsed->replacementMaintenancable->typeOtherMaintenance ? $replacementUsed->replacementMaintenancable->typeOtherMaintenance->name : '' }}
-            </td>
-            <td>{{ $replacementUsed->replacementMaintenancable->device ? $replacementUsed->replacementMaintenancable->device->element->name : '' }}</td>
-            <td>{{ $replacementUsed->replacementMaintenancable->device ? $replacementUsed->replacementMaintenancable->device->internal_code : '' }}</td>
-            <td>{{ $replacementUsed->replacementMaintenancable->device ? $replacementUsed->replacementMaintenancable->device->serial_number : '' }}</td>
-            <td>{{ $replacementUsed->replacementMaintenancable->reason }}</td>
-            <td>{{ $replacementUsed->replacementMaintenancable->conclusion }}</td>
-
+            <td>{{ $replacementUsed->maintenance_date_of_realization }}</td>
+            <td>{{ $replacementUsed->replacement_name }}</td>
+            <td>{{ $replacementUsed->replacement_quantity }}</td>
+            <td>{{ $replacementUsed->element_name }}</td>
+            <td>{{ $replacementUsed->device_internal_code }}</td>
+            <td>{{ $replacementUsed->device_serial_number }}</td>
+            <td>{{ $replacementUsed->preventive_maintenance_reason }}</td>
+            <td>{{ $replacementUsed->preventive_maintenance_support_description }}</td>
         </tr>
     @endforeach
     </tbody>

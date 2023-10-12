@@ -26,7 +26,7 @@
             <td>{{ $preventiveMaintenance->dependence->name }}</td>  
             <td>{{ $preventiveMaintenance->user->names }}</td>
             <td>
-                @foreach ($preventiveMaintenance->replacementMaintenancables as $replacement )
+                @foreach ($preventiveMaintenance->replacements as $replacement )
                     {{ $replacement->replacement->name . ' - cantidad:' . $replacement->quantity }} 
                     @if (!$loop->last)
                         <br>

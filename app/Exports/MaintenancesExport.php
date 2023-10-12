@@ -36,7 +36,7 @@ class MaintenancesExport implements FromView
                                 ->with('device.group')
                                 ->with('location')
                                 ->with('dependence')
-                                ->with('replacementMaintenancables.replacement')
+                                ->with('replacements.replacement')
                                 ->orderBy('date_of_realization_ending', 'desc')
                                 ->get();
 
@@ -58,7 +58,7 @@ class MaintenancesExport implements FromView
                                 ->with('device')
                                 ->with('location')
                                 ->with('dependence')
-                                ->with('replacementMaintenancables.replacement')
+                                ->with('replacements.replacement')
                                 ->with('typeOtherMaintenance')
                                 ->with('failureMode')
                                 ->orderBy('date_of_realization_ending', 'desc')
@@ -74,9 +74,10 @@ class MaintenancesExport implements FromView
                         })
                         ->with('user:id,names')
                         ->whereDoesntHave('device')
+                        ->where('group_id', $this->group)
                         ->with('location')
                         ->with('dependence')
-                        ->with('replacementMaintenancables.replacement')
+                        ->with('replacements.replacement')
                         ->with('typeOtherMaintenance')
                         ->orderBy('date_of_realization_ending', 'desc')
                         ->get();

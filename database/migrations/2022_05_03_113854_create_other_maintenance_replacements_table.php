@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateReplacementMaintenancesTable extends Migration
+class CreateOtherMaintenanceReplacementsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,14 +13,13 @@ class CreateReplacementMaintenancesTable extends Migration
      */
     public function up()
     {
-        Schema::create('replacement_maintenances', function (Blueprint $table) {
+        Schema::create('other_maintenance_replacements', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('other_maintenance_id')->nullable();
+            $table->foreign('other_maintenance_id')->references('id')->on('other_maintenances');
             $table->unsignedBigInteger('replacement_id');
             $table->foreign('replacement_id')->references('id')->on('replacements');
             $table->integer('quantity');
-
-            $table->bigInteger('replacement_maintenancable_id');
-            $table->string('replacement_maintenancable_type');
             $table->timestamps();
         });
     }
@@ -32,6 +31,6 @@ class CreateReplacementMaintenancesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('replacement_maintenances');
+        Schema::dropIfExists('other_maintenance_replacements');
     }
 }

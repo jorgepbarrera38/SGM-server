@@ -10,6 +10,7 @@ use App\Models\Brand;
 use App\Models\Group;
 use App\Models\Device;
 use App\Models\Period;
+use App\Models\Permission;
 use App\Models\TypeOtherMaintenance;
 use App\Models\Company;
 use Illuminate\Database\Seeder;
@@ -25,14 +26,16 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(PermissionsTableSeeder::class);
         
-        /*\App\Models\User::create([
+        $user = \App\Models\User::create([
             'names' => 'Administrador',
             'username' => 'admin',
             'password' => bcrypt(123),
             'official_position' => 'Administrador del sistema',
             'technical_support' => true
-        ]);*/
-/*
+        ]);
+
+        $user->permissions()->attach(Permission::pluck('id'));
+        /*
         Element::factory()->count(4)->create();
         Location::factory()->count(3)->create();
         Dependence::factory()->count(10)->create();
@@ -42,7 +45,7 @@ class DatabaseSeeder extends Seeder
         Device::factory()->count(20)->create();
         Period::factory()->count(1)->create();
         TypeOtherMaintenance::factory()->count(1)->create();
-        Company::factory()->count(1)->create();*/
-        
+        Company::factory()->count(1)->create();
+        */
     }
 }

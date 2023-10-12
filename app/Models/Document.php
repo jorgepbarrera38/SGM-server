@@ -23,4 +23,8 @@ class Document extends Model
     public function typeDocument () {
         return $this->belongsTo('App\Models\TypeDocument');
     }
+
+    public function device () {
+        return $this->belongsTo('App\Models\Device');
+    }
 }

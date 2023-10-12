@@ -14,7 +14,7 @@ class AddFailureModeToOtherMaintenancesTable extends Migration
     public function up()
     {
         Schema::table('other_maintenances', function (Blueprint $table) {
-            $table->unsignedBigInteger('failure_mode_id')->after('conclusion')->nullable();
+            $table->unsignedBigInteger('failure_mode_id')->after('support_description')->nullable();
             $table->foreign('failure_mode_id')->references('id')->on('failure_modes');
         });
     }

@@ -55,7 +55,7 @@ use Illuminate\Support\Facades\Storage;
             'date_of_realization_ending' => $request->date_of_realization_ending,
             'typeMaintenance' => $typeMaintenance,
             'reason' => $request->reason,
-            'conclusion' => $request->conclusion,
+            'support_description' => $request->support_description,
             'replacementsFromReport' => $replacementsFromReport,
             'device' => $device,
             'photographicAnnexes' => $request->photographicAnnexes ? array_chunk($request->photographicAnnexes, 2) : [],
@@ -67,7 +67,7 @@ use Illuminate\Support\Facades\Storage;
         ];
     }
 
-    function getDataForReportDigitalToPreventiveMaintenance($request, $replacements, $device = null) {
+    function getDataForReportDigitalToPreventiveMaintenance($request, $replacements, $checklists, $device = null) {
         $companyLogo = Company::first()->logo;
         $reason = Company::first()->reason_preventive_maintenance_report_digital;
 
@@ -84,8 +84,9 @@ use Illuminate\Support\Facades\Storage;
             'date_of_realization_ending' => $request->date_of_realization_ending,
             'typeMaintenance' => null, //Se envía null para validar en blade y como no tiene clasificación se pone Mantenimiento preventivo
             'replacementsFromReport' => $replacementsFromReport,
+            'checklists' => $checklists,
             'reason' => $reason,
-            'conclusion' => $request->conclusion,
+            'support_description' => $request->support_description,
             'photographicAnnexes' => $request->photographicAnnexes ? array_chunk($request->photographicAnnexes, 2) : [],
             'device' => $device,
             'signature' => $request->signature,

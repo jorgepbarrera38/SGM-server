@@ -10,13 +10,19 @@ class PreventiveMaintenance extends Model
     use HasFactory;
 
     protected $fillable = [
+        'type',
         'date_of_realization',
         'date_of_realization_ending',
+        'reason',
+        'support_description',
         'evidence',
         'reason',
         'location_id',
         'dependence_id',
-        'user_id'
+        'official_names',
+        'official_position',
+        'user_id',
+        'signature',
     ];
 
     public function user () {
@@ -27,12 +33,20 @@ class PreventiveMaintenance extends Model
         return $this->belongsTo('App\Models\Device');
     }
 
-    public function replacementMaintenancables () {
-        return $this->morphMany('App\Models\ReplacementMaintenance', 'replacement_maintenancable');
-    }
-
     public function scheduleMaintenanceDetail () {
         return $this->hasOne('App\Models\ScheduleMaintenanceDetail');
+    }
+
+    public function replacements () {
+        return $this->hasMany('App\Models\PreventiveMaintenanceReplacement', 'prev_maintenance_id');
+    }
+
+    public function photographicAnnexes () {
+        return $this->hasMany('App\Models\PreventiveMaintenancePhotographicAnnexe', 'prev_m_id');
+    }
+
+    public function checklists () {
+        return $this->hasMany('App\Models\PreventiveMaintenanceChecklist');
     }
 
     public function location () {

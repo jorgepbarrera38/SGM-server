@@ -34,20 +34,22 @@ class PreventiveMaintenanceRequest extends FormRequest
             'type_report' => ['required', Rule::in([1,2])],
             'date_of_realization' => 'required|date',
             'date_of_realization_ending' => 'required|date|after_or_equal:date_of_realization',
+            'reason' => 'required_if:type_report,1|nullable|max:600',
+            'support_description' => 'required_if:type_report,1|nullable|max:10000',
             'evidence' => 'required_if:type_report,2|nullable|mimes:pdf|max:25000',
             'signature' => 'required_if:type_report,1|base64image',
-            'official_names' => 'required_if:type_report,1|nullable|max:50',
-            'official_position' => 'required_if:type_report,1|nullable|max:30',
-            'conclusion' => 'required_if:type_report,1|max:400',
+            'official_names' => 'required_if:type_report,1|nullable|max:70',
+            'official_position' => 'required_if:type_report,1|nullable|max:40',
         ];
     }
 
     public function messages () {
         return [
+            'reason.required_if' => 'El campo Motivo es obligatorio cuando el campo Tipo es Digital.',
+            'support_description.required_if' => 'El campo Descripción del soporte es obligatorio cuando el campo Tipo es Digital.',
             'evidence.required_if' => 'El campo Evidencia es obligatorio',
             'official_names.required_if' => 'El campo Funcionario es obligatorio',
             'official_position.required_if' => 'El campo Cargo es obligatorio',
-            'conclusion.required_if' => 'El campo Descripción del soporte es obligatorio',
             'date_of_realization_ending.after_or_equal' => 'La Fecha y hora fin de realización debe ser superior a la fecha y hora inicio de realización.'
         ];
     }
@@ -60,7 +62,7 @@ class PreventiveMaintenanceRequest extends FormRequest
             'evidence' => 'Evidencia',
             'official_names' => 'Funcionario',
             'official_position' => 'Cargo',
-            'conclusion' => 'Descripción del soporte'
+            'support_description' => 'Descripción del soporte'
         ];
     }
 }
