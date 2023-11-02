@@ -29,7 +29,7 @@ class DatabaseSeeder extends Seeder
         $user = \App\Models\User::create([
             'names' => 'Administrador',
             'username' => 'admin',
-            'password' => bcrypt(123),
+            'password' => bcrypt('admin'),
             'official_position' => 'Administrador del sistema',
             'technical_support' => true
         ]);
