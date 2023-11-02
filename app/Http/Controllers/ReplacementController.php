@@ -32,9 +32,11 @@ class ReplacementController extends Controller
     public function store(Request $request)
     {
         $data = $request->validate([
-            'name' => 'required|max:30|unique:replacements,name'
+            'name' => 'required|max:30|unique:replacements,name',
+            'price' => 'required|numeric|min:0|max:1000000000',
         ], [], [
-            'name' => 'Nombre'
+            'name' => 'Nombre',
+            'price' => 'Precio',
         ]);
 
         Replacement::create($data);
@@ -61,9 +63,11 @@ class ReplacementController extends Controller
     public function update(Request $request, Replacement $replacement)
     {
         $data = $request->validate([
-            'name' => 'required|max:30|unique:replacements,name,' . $replacement->id
+            'name' => 'required|max:30|unique:replacements,name,' . $replacement->id,
+            'price' => 'required|numeric|min:0|max:1000000000',
         ], [], [
-            'name' => 'Nombre'
+            'name' => 'Nombre',
+            'price' => 'Precio',
         ]);
 
         $replacement->update($data);

@@ -10,7 +10,8 @@ class Replacement extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name'
+        'name',
+        'price',
     ];
 
     public function scopeName($query, $name) {
