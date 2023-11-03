@@ -27,7 +27,7 @@ class OtherMaintenanceController extends Controller
 
     public function getDataToCreateOtherMaintenance () {
         $typeOtherMaintenances =  TypeOtherMaintenance::orderBy('name')->get(['id', 'name']);
-        $replacements = Replacement::orderBy('name')->get(['id', 'name']);
+        $replacements = Replacement::orderBy('name')->get(['id', 'name', 'price']);
         $failureModes = FailureMode::orderBy('name')->get(['id', 'name']);
         $checklists = Checklist::with('checklistGroups.checklistItems')->orderBy('name')->get();
         

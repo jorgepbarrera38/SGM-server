@@ -20,6 +20,7 @@ use Illuminate\Support\Facades\Storage;
 
     function replacementsHasErrors ($replacements) {
         $rules = [
+            '*.price' => 'required|numeric|min:0|max:1000000000',
             '*.quantity' => 'required|numeric|min:1|max:100',
             '*.replacement_id' => 'required|exists:replacements,id',
         ];

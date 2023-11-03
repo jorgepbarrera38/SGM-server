@@ -13,6 +13,7 @@ class PreventiveMaintenanceReplacement extends Model
         'prev_maintenance_id',
         'replacement_id',
         'quantity',
+        'price',
     ];
 
     public function replacement () {

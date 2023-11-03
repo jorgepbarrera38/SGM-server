@@ -190,7 +190,7 @@ class PreventiveMaintenanceController extends Controller
     public function edit($preventiveMaintenance)
     {
         $preventiveMaintenance = PreventiveMaintenance::with(['replacements.replacement', 'photographicAnnexes'])->where('id', $preventiveMaintenance)->firstOrFail();
-        $replacements = Replacement::orderBy('name')->get(['id', 'name']);
+        $replacements = Replacement::orderBy('name')->get(['id', 'name', 'price']);
         $checklists = Checklist::with('checklistGroups.checklistItems')->orderBy('name')->get();
         $checklistsFromPreventive = $preventiveMaintenance->checklists->load('checklistGroups.checklistItems');
 

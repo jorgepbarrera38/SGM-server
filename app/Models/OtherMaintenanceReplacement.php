@@ -13,6 +13,7 @@ class OtherMaintenanceReplacement extends Model
         'other_maintenance_id',
         'replacement_id',
         'quantity',
+        'price',
     ];
 
     public function replacement () {
